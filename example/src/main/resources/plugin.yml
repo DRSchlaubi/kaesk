@@ -1,0 +1,10 @@
+main: me.schlaubi.kaesk.GameModePlugin
+name: GameModePlugin
+version: '1.0'
+author: mik
+api-version: '1.13'
+commands:
+  gamemode:
+  say:
+  sum:
+  test:
