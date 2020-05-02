@@ -67,7 +67,7 @@ repositories {
 }
 
 dependencies {
-    implementation("me.schlaubi", "kaesk", "1.0")
+    implementation("me.schlaubi", "kaesk", "1.1")
 }
 ```
 
@@ -78,7 +78,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'me.schlaubi:kaesk:1.0"'
+    implementation 'me.schlaubi:kaesk:1.1"'
 }
 ```
 
@@ -95,7 +95,7 @@ dependencies {
   <dependency>
     <groupId>me.schlaubi</groupId>
     <artifactId>kaesk</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
   </dependency>
 </dependencies>
 ```
