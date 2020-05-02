@@ -2,7 +2,9 @@ package me.schlaubi.kaesk.internal;
 
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,11 +104,14 @@ class CommandClassCompiler {
   private List<PotentialCommand> readMethods(@NotNull Class<?> clazz) {
     return Arrays.stream(clazz.getDeclaredMethods())
         .filter(method -> method.isAnnotationPresent(Command.class)).map(method -> {
+          Preconditions.checkArgument(Modifier.isPublic(method.getModifiers()),
+              "Command method must be public! Method: ".formatted(method));
           CommandParents parents = findCommandParents(method);
 
           Command annotation = method.getAnnotation(Command.class);
           if (annotation.root()) {
-            Preconditions.checkArgument(parents == null, "Root command cannot have parents!");
+            Preconditions.checkArgument(parents == null,
+                "Root command cannot have parents! Method: ".formatted(method));
           }
           return new PotentialCommand(method, annotation, parents);
         }).collect(Collectors.toUnmodifiableList());
@@ -162,17 +167,20 @@ class CommandClassCompiler {
             Preconditions.checkState(deserializers.get(type).supportsVararg(),
                 "Type %s does not support var args! Method: %s".formatted(type, method));
           }
-          String name = findParameterName(parameter);
-          return new CommandParameter(type, isVarArg, name);
+          var data = findParameterData(parameter);
+          var name = data.getKey();
+          var surrounding = data.getValue();
+          return new CommandParameter(type, isVarArg, name, surrounding);
         }).collect(Collectors.toUnmodifiableList());
   }
 
   @NotNull
-  private String findParameterName(@NotNull Parameter parameter) {
+  private AbstractMap.SimpleEntry<String, String> findParameterData(@NotNull Parameter parameter) {
     if (parameter.isAnnotationPresent(CommandArgument.class)) {
-      return parameter.getAnnotation(CommandArgument.class).name();
+      var annotation = parameter.getAnnotation(CommandArgument.class);
+      return new AbstractMap.SimpleEntry<>(annotation.name(), annotation.surrounded());
     } else {
-      return parameter.getName();
+      return new AbstractMap.SimpleEntry<>(parameter.getName(), "");
     }
   }
 

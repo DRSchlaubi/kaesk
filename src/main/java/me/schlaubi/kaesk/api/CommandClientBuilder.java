@@ -21,6 +21,7 @@ public class CommandClientBuilder {
   private Map<Class<?>, ArgumentDeserializer<?>> deserializers = allDeserializers();
   private JavaPlugin plugin;
   private InvalidArgumentHandler argumentHandler;
+  private NoPermissionHandler noPermissionHandler;
 
   /**
    * Default constructor.
@@ -124,6 +125,19 @@ public class CommandClientBuilder {
   }
 
   /**
+   * Sets the {@link NoPermissionHandler}.
+   *
+   * @param noPermissionHandler the handler
+   * @return the builder
+   * @see NoPermissionHandler
+   */
+  @NotNull
+  public CommandClientBuilder setNoPermissionHandler(NoPermissionHandler noPermissionHandler) {
+    this.noPermissionHandler = noPermissionHandler;
+    return this;
+  }
+
+  /**
    * Builds the {@link CommandClient}.
    *
    * @return the command client
@@ -132,7 +146,8 @@ public class CommandClientBuilder {
   public CommandClient build() {
     Preconditions.checkNotNull(plugin, "Plugin may not be null");
     Preconditions.checkNotNull(argumentHandler, "Argument handler may not be null");
-    return new DefaultCommandClient(deserializers, plugin, argumentHandler);
+    Preconditions.checkNotNull(noPermissionHandler, "Permission handler may not be null");
+    return new DefaultCommandClient(deserializers, plugin, argumentHandler, noPermissionHandler);
   }
 
   @NotNull

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import me.schlaubi.kaesk.api.NoPermissionHandler;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
 import me.schlaubi.kaesk.api.ArgumentException;
 import me.schlaubi.kaesk.api.InvalidArgumentHandler;
@@ -21,12 +22,15 @@ class CommandExecutor {
 
   private final Map<Class<?>, ArgumentDeserializer<?>> deserializers;
   private final InvalidArgumentHandler argumentHandler;
+  private NoPermissionHandler noPermissionHandler;
 
   public CommandExecutor(
-       @NotNull Map<Class<?>, ArgumentDeserializer<?>> deserializers,
-      @NotNull InvalidArgumentHandler argumentHandler) {
+      @NotNull Map<Class<?>, ArgumentDeserializer<?>> deserializers,
+      @NotNull InvalidArgumentHandler argumentHandler,
+      NoPermissionHandler noPermissionHandler) {
     this.deserializers = deserializers;
     this.argumentHandler = argumentHandler;
+    this.noPermissionHandler = noPermissionHandler;
   }
 
   @SuppressWarnings("unused")
@@ -41,8 +45,9 @@ class CommandExecutor {
       return true;
     }
 
-    if (!invoke.permission().isBlank() && !sender.hasPermission(invoke.permission())) {
-      sender.sendMessage("No permission");
+    var permission = invoke.permission();
+    if (!permission.isBlank() && !sender.hasPermission(permission)) {
+      noPermissionHandler.handleNoPermissions(sender, permission);
       return true;
     }
 

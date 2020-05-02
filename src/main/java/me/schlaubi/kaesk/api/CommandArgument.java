@@ -17,9 +17,18 @@ public @interface CommandArgument {
 
   /**
    * The name of the parameter in help messages.
+   *
    * @return the name
    */
   @NotNull
   String name();
+
+  /**
+   * Prefix/suffix that is surrounding the argument.
+   *
+   * @return the prefix/suffix
+   */
+  @NotNull
+  String surrounded() default "";
 
 }

@@ -22,16 +22,19 @@ public class TabCompleter {
     /* package-private */ List<String> onTabComplete(CompiledCommandClass compiledCommand,
       CommandSender sender,
       Command command, String alias, String[] args) {
-    List<String> possibleArgs = findArgs(compiledCommand, args);
+    List<String> possibleArgs = findArgs(compiledCommand, args, sender);
     return possibleArgs.stream()
         .filter(it -> it.toUpperCase().startsWith(args[args.length - 1].toUpperCase()))
         .collect(Collectors.toUnmodifiableList());
   }
 
   private List<String> findArgs(CompiledCommandClass compiledCommand,
-      String[] args) {
+      String[] args, CommandSender sender) {
     var commandContainer = CommandUtils.findCommandInvokable(compiledCommand, args);
     var invoke = commandContainer.getInvoke();
+    if (!sender.hasPermission(invoke.permission())) {
+      return Collections.emptyList();
+    }
     CommandParameter currentParameter = findCurrentParameter(invoke, args.length);
 
     if (currentParameter == null) {
@@ -49,7 +52,10 @@ public class TabCompleter {
     if (args.length >= 1) {
       var list = new ArrayList<>(possible);
       list.addAll(commandContainer.getTreeElement().getChildren().entrySet().stream()
-          .filter(it -> it.getValue().getLevel() == args.length).map(Map.Entry::getKey)
+          .filter(it -> it.getValue().getLevel() == args.length
+              && it.getValue().getInvokables().stream()
+              .anyMatch(child -> child.permission().isBlank() || sender
+                  .hasPermission(child.permission()))).map(Map.Entry::getKey)
           .collect(Collectors.toUnmodifiableList()));
       possible = Collections.unmodifiableList(list);
     }

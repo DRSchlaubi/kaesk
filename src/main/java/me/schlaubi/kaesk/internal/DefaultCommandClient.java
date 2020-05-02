@@ -3,6 +3,7 @@ package me.schlaubi.kaesk.internal;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Map;
+import me.schlaubi.kaesk.api.NoPermissionHandler;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
 import me.schlaubi.kaesk.api.CommandClient;
 import me.schlaubi.kaesk.api.InvalidArgumentHandler;
@@ -20,11 +21,12 @@ public class DefaultCommandClient implements CommandClient {
 
   public DefaultCommandClient(
       Map<Class<?>, ArgumentDeserializer<?>> deserializers,
-      JavaPlugin plugin, InvalidArgumentHandler argumentHandler) {
+      JavaPlugin plugin, InvalidArgumentHandler argumentHandler,
+      NoPermissionHandler noPermissionHandler) {
     this.compiler = new CommandClassCompiler(deserializers);
     this.plugin = plugin;
     this.tabCompleter = new TabCompleter(deserializers);
-    this.commandExecutor = new CommandExecutor(deserializers, argumentHandler);
+    this.commandExecutor = new CommandExecutor(deserializers, argumentHandler, noPermissionHandler);
   }
 
   /* package-private */ boolean onCommand(CompiledCommandClass compiledCommand,
