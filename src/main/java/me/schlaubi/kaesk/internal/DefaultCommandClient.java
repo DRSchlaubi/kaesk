@@ -45,7 +45,6 @@ public class DefaultCommandClient implements CommandClient {
   public void registerCommand(@NotNull Object command) {
     Preconditions.checkNotNull(command, "Command may not be null");
     var compiledCommand = compiler.compile(command);
-    System.out.println("Built command tree: %s".formatted(compiledCommand.commandTree()));
     var bukkitCommand = plugin.getCommand(compiledCommand.name());
     Preconditions.checkNotNull(bukkitCommand, "Command is null! Forgot plugin.yml?");
     bukkitCommand.setExecutor(new DelegatingCommand(this, compiledCommand));

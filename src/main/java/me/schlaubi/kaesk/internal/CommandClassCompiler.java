@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,20 +166,18 @@ class CommandClassCompiler {
             Preconditions.checkState(deserializers.get(type).supportsVararg(),
                 "Type %s does not support var args! Method: %s".formatted(type, method));
           }
-          var data = findParameterData(parameter);
-          var name = data.getKey();
-          var surrounding = data.getValue();
-          return new CommandParameter(type, isVarArg, name, surrounding);
+          var name = findParameterName(parameter);
+          return new CommandParameter(type, isVarArg, name);
         }).collect(Collectors.toUnmodifiableList());
   }
 
   @NotNull
-  private AbstractMap.SimpleEntry<String, String> findParameterData(@NotNull Parameter parameter) {
+  private String findParameterName(@NotNull Parameter parameter) {
     if (parameter.isAnnotationPresent(CommandArgument.class)) {
       var annotation = parameter.getAnnotation(CommandArgument.class);
-      return new AbstractMap.SimpleEntry<>(annotation.name(), annotation.surrounded());
+      return annotation.name();
     } else {
-      return new AbstractMap.SimpleEntry<>(parameter.getName(), "");
+      return parameter.getName();
     }
   }
 

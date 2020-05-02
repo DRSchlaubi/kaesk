@@ -23,12 +23,4 @@ public @interface CommandArgument {
   @NotNull
   String name();
 
-  /**
-   * Prefix/suffix that is surrounding the argument.
-   *
-   * @return the prefix/suffix
-   */
-  @NotNull
-  String surrounded() default "";
-
 }
