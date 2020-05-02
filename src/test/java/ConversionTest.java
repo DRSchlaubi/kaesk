@@ -2,6 +2,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
 import me.schlaubi.kaesk.api.converters.Converters;
+import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -105,17 +106,33 @@ public class ConversionTest {
     testVarArgFail("to sh o rt", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
   }
 
+  @Test
+  public void testEnums() {
+    var deserializers = Converters.newEnumDeserializer(GameMode[]::new);
+    testPass(GameMode.CREATIVE, deserializers, GameMode.class);
+    testPass(GameMode.ADVENTURE, deserializers, GameMode.class);
+    testPass(GameMode.SURVIVAL, deserializers, GameMode.class);
+  }
+
+  @Test
+  public void testInvalidEnums() {
+    var deserializers = Converters.newEnumDeserializer(GameMode[]::new);
+    testFail("GRARG", deserializers, GameMode.class);
+  }
+
   private <T> void testVarargPass(T[] input, ArgumentDeserializer<T> deserializer, Class<?> clazz) {
     var args = Arrays.stream(input).map(Object::toString).collect(Collectors.joining(" "));
     var parsed = testVararg(args, deserializer, true, clazz);
     Assertions.assertArrayEquals(input, parsed, "Parsed value should be the same");
   }
 
-  private <T> void testVarArgFail(String input, ArgumentDeserializer<T> deserializer, Class<?> clazz) {
+  private <T> void testVarArgFail(String input, ArgumentDeserializer<T> deserializer,
+      Class<?> clazz) {
     testVararg(input, deserializer, false, clazz);
   }
 
-  private <T> T[] testVararg(String input, ArgumentDeserializer<T> deserializer, boolean isValid, Class<?> clazz) {
+  private <T> T[] testVararg(String input, ArgumentDeserializer<T> deserializer, boolean isValid,
+      Class<?> clazz) {
     var args = input.split("\\s+");
     Assertions.assertEquals(isValid, deserializer.varargIsValid(args, clazz),
         "Is valid is expected to be %s".formatted(isValid));
@@ -134,7 +151,8 @@ public class ConversionTest {
     test(input, deserializer, false, clazz);
   }
 
-  private <T> T test(String input, ArgumentDeserializer<T> deserializer, boolean isValid, Class<?> clazz) {
+  private <T> T test(String input, ArgumentDeserializer<T> deserializer, boolean isValid,
+      Class<?> clazz) {
     Assertions.assertEquals(isValid, deserializer.isValid(input, clazz),
         "Is valid is expected to be %s".formatted(isValid));
     if (!isValid) {

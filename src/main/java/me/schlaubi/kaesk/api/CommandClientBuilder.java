@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import me.schlaubi.kaesk.api.converters.Converters;
 import me.schlaubi.kaesk.internal.DefaultCommandClient;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -139,9 +141,12 @@ public class CommandClientBuilder {
     deserializerMap.put(Integer.class, Converters.INTEGER);
     deserializerMap.put(Float.class, Converters.FLOAT);
     deserializerMap.put(Double.class, Converters.DOUBLE);
+    deserializerMap.put(Short.class, Converters.SHORT);
     deserializerMap.put(OfflinePlayer.class, Converters.OFFLINE_PLAYER);
     deserializerMap.put(Player.class, Converters.PLAYER);
     deserializerMap.put(String.class, Converters.STRING);
+    deserializerMap.put(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new));
+    deserializerMap.put(Material.class, Converters.newEnumDeserializer(Material[]::new));
     return deserializerMap;
   }
 

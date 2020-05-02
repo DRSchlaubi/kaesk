@@ -21,6 +21,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Converters {
 
+  private Converters() {
+
+  }
+
   /**
    * Converter for Integer.
    */
@@ -44,6 +48,13 @@ public class Converters {
    */
   public static final ArgumentDeserializer<Double> DOUBLE = new NumberDeserializer<>(
       Double::parseDouble, Double[]::new);
+
+  /**
+   * Converter for Short.
+   */
+  public static final ArgumentDeserializer<Short> SHORT = new NumberDeserializer<>(
+      Short::parseShort, Short[]::new
+  );
 
   /**
    * Converter for Player.
@@ -118,7 +129,8 @@ public class Converters {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public @NotNull List<String> providePossibilities(@NotNull String parameterName, boolean isVarArg,
+    public @NotNull List<String> providePossibilities(@NotNull String parameterName,
+        boolean isVarArg,
         Class<?> clazz) {
       return getPlayers().stream().map(OfflinePlayer::getName)
           .collect(Collectors.toUnmodifiableList());
@@ -280,7 +292,8 @@ public class Converters {
     }
 
     @Override
-    public @NotNull List<String> providePossibilities(@NotNull String parameterName, boolean isVarArg,
+    public @NotNull List<String> providePossibilities(@NotNull String parameterName,
+        boolean isVarArg,
         Class<?> clazz) {
       return Arrays.stream(clazz.getEnumConstants()).map(Object::toString)
           .collect(Collectors.toUnmodifiableList());
