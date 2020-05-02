@@ -56,7 +56,7 @@ Register the command
 For more information take a look at the example [here](https://github.com/DRSchlaubi/kaesk/tree/master/example)
 
 ## Javadoc
-The completely ugly javadoc (thx oracle) can be found [here](https://drschlaubi.github.io/mgisdumb)
+The completely ugly javadoc (thx oracle) can be found [here](https://p.mik.wtf)
 
 ## Download
 You can get the latest version from [bintray](https://bintray.com/drschlaubi/maven/kaesk)
