@@ -7,6 +7,8 @@ This is a very simple Spigot command parser
 
 ## Usage
 Make a command.
+
+### Root command
 ```java
 @CommandClass(name = "gamemode", permission = "plugin.gamemode")
 public class GameModeCommand {
@@ -15,18 +17,38 @@ public class GameModeCommand {
   public void rootCommand(CommandSender sender) {
     sender.sendMessage("Usage: /gamemode <mode> <player>");
   }
-}e
+}
+```
+
+### Sub command
+
+```java
+@Command(name = "sub")
+public void subCommand(Player player) {
+  // because console is not allowed first argument ist auto-casted to player
+}
+```
+
+### NSub command
+```java
+@CommandParents({"sub"})
+@Command(name = "sub")
+public void subCommand(Player player, @CommandParameter(name = "playerName") String playerName) {
+  // parameter names get discarded at compile time so you can use an annotations
+}
 ```
 
 Register the command
 ```java
   @Override
   public void onEnable() {
-    var commandClient = new CommandClientBuilder(this)
-        .addDeserializer(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new))
-        .setArgumentHandler((error, sender) -> sender.sendMessage(
-            "Place enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
-        .build();
+    commandClient = new CommandClientBuilder(this)
+            // no longer needed since this is registered by default
+    //        .addDeserializer(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new))
+            .setArgumentHandler((error, sender) -> sender.sendMessage(
+                "Place enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
+            .setNoPermissionHandler((sender, permission) -> sender.sendMessage("You need the permission %s to proceed".formatted(permission)))
+            .build();
     commandClient.registerCommand(new SumCommand());
   }
 ```
@@ -38,6 +60,45 @@ The completely ugly javadoc (thx oracle) can be found [here](https://drschlaubi.
 
 ## Download
 You can get the latest version from [bintray](https://bintray.com/drschlaubi/maven/kaesk)
+### Gradle (Kotlin)
+```kotlin
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation("me.schlaubi", "kaesk", "1.0")
+}
+```
+
+### Gradle (Groovy)
+```groovy
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'me.schlaubi:kaesk:1.0"'
+}
+```
+
+### Maven
+```xml
+<repositories>
+  <repository>
+    <name>jcenter</name>
+    <url>https://jcenter.bintray.com</url>
+  </repository>
+</repositories>
+
+<dependencies>
+  <dependency>
+    <groupId>me.schlaubi</groupId>
+    <artifactId>kaesk</artifactId>
+    <version>1.0</version>
+  </dependency>
+</dependencies>
+```
 
 ## Credits
 Thanks to [Paul2708](https://github.com/Paul2708) for creating [simple-commands](https://github.com/Paul2708/simple-commands) as I kinda copyed his idea.

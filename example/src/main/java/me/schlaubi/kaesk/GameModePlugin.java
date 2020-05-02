@@ -15,6 +15,7 @@ public class GameModePlugin extends JavaPlugin {
 //        .addDeserializer(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new))
         .setArgumentHandler((error, sender) -> sender.sendMessage(
             "Place enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
+        .setNoPermissionHandler((sender, permission) -> sender.sendMessage("You need the permission %s to proceed".formatted(permission)))
         .build();
     commandClient.registerCommand(new GameModeCommand());
     commandClient.registerCommand(new SayCommand());
