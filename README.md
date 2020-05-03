@@ -87,7 +87,7 @@ dependencies {
 ```xml
 <repositories>
   <repository>
-    <name>jcenter</name>
+    <id>jcenter</id>
     <url>https://jcenter.bintray.com</url>
   </repository>
 </repositories>
