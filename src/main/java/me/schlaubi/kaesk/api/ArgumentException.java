@@ -16,8 +16,8 @@ public class ArgumentException extends IllegalArgumentException {
    * @param deserializer the deserializer that reported the wrong argument
    * @param parameterType the type of the argument
    */
-  public ArgumentException(@NotNull ArgumentDeserializer<?> deserializer,
-      @NotNull Class<?> parameterType) {
+  public ArgumentException(@NotNull final ArgumentDeserializer<?> deserializer,
+      @NotNull final Class<?> parameterType) {
     this.deserializer = deserializer;
     this.parameterType = parameterType;
   }
@@ -30,8 +30,8 @@ public class ArgumentException extends IllegalArgumentException {
    * @param message the message of this exception
    * @see Exception#Exception(String)
    */
-  public ArgumentException(@NotNull String message, @NotNull ArgumentDeserializer<?> deserializer,
-      Class<?> parameterType) {
+  public ArgumentException(@NotNull final  String message, @NotNull ArgumentDeserializer<?> deserializer,
+      final Class<?> parameterType) {
     super(message);
     this.deserializer = deserializer;
     this.parameterType = parameterType;
@@ -46,8 +46,8 @@ public class ArgumentException extends IllegalArgumentException {
    * @param message the message of this exception
    * @see Exception#Exception(String, Throwable)
    */
-  public ArgumentException(@NotNull String message, @NotNull Throwable cause,
-      @NotNull ArgumentDeserializer<?> deserializer, @NotNull Class<?> parameterType) {
+  public ArgumentException(@NotNull final String message, @NotNull final Throwable cause,
+      @NotNull final ArgumentDeserializer<?> deserializer, @NotNull final Class<?> parameterType) {
     super(message, cause);
     this.deserializer = deserializer;
     this.parameterType = parameterType;
@@ -61,8 +61,8 @@ public class ArgumentException extends IllegalArgumentException {
    * @param cause the cause of this exception
    * @see Exception#Exception(Throwable)
    */
-  public ArgumentException(@NotNull Throwable cause,
-      @NotNull ArgumentDeserializer<?> deserializer, @NotNull Class<?> parameterType) {
+  public ArgumentException(@NotNull final Throwable cause,
+      @NotNull final ArgumentDeserializer<?> deserializer, @NotNull final Class<?> parameterType) {
     super(cause);
     this.deserializer = deserializer;
     this.parameterType = parameterType;
@@ -74,7 +74,7 @@ public class ArgumentException extends IllegalArgumentException {
    * @return the reporting {@link ArgumentDeserializer}
    */
   @NotNull
-  public ArgumentDeserializer<?> getDeserializer() {
+  public final ArgumentDeserializer<?> getDeserializer() {
     return deserializer;
   }
 
@@ -84,7 +84,7 @@ public class ArgumentException extends IllegalArgumentException {
    * @return the type of the parameter
    */
   @NotNull
-  public Class<?> getParameterType() {
+  public final Class<?> getParameterType() {
     return parameterType;
   }
 }

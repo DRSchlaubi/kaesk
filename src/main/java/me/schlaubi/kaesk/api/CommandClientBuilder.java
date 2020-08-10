@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * Builder for {@link CommandClient}.
  */
 @SuppressWarnings("unused")
-public class CommandClientBuilder {
+public final class CommandClientBuilder {
 
   private Map<Class<?>, ArgumentDeserializer<?>> deserializers = allDeserializers();
   private JavaPlugin plugin;
@@ -34,7 +34,7 @@ public class CommandClientBuilder {
    *
    * @param plugin the {@link JavaPlugin} that is registering commands.
    */
-  public CommandClientBuilder(@NotNull JavaPlugin plugin) {
+  public CommandClientBuilder(@NotNull final JavaPlugin plugin) {
     this.plugin = plugin;
   }
 
@@ -45,8 +45,8 @@ public class CommandClientBuilder {
    * @param argumentHandler the {@link InvalidArgumentHandler} that handles invalid argument input.
    */
   @NotNull
-  public CommandClientBuilder(@NotNull JavaPlugin plugin,
-      @NotNull InvalidArgumentHandler argumentHandler) {
+  public CommandClientBuilder(@NotNull final JavaPlugin plugin,
+      @NotNull final InvalidArgumentHandler argumentHandler) {
     this.plugin = plugin;
     this.argumentHandler = argumentHandler;
   }
@@ -60,8 +60,8 @@ public class CommandClientBuilder {
    * @return the builder
    */
   @NotNull
-  public <T> CommandClientBuilder addDeserializer(@NotNull Class<T> clazz,
-      ArgumentDeserializer<T> deserializer) {
+  public <T> CommandClientBuilder addDeserializer(@NotNull final Class<T> clazz,
+      final ArgumentDeserializer<T> deserializer) {
     Preconditions.checkNotNull(clazz, "Class may not be null");
     Preconditions.checkNotNull(deserializer, "Deserializer may not be null");
     deserializers.put(clazz, deserializer);
@@ -77,7 +77,7 @@ public class CommandClientBuilder {
    */
   @NotNull
   public CommandClientBuilder setDeserializers(
-      @NotNull Map<Class<?>, ArgumentDeserializer<?>> deserializers) {
+      @NotNull final Map<Class<?>, ArgumentDeserializer<?>> deserializers) {
     Preconditions.checkNotNull(deserializers, "Deserializers may not be null");
     this.deserializers = deserializers;
     return this;
@@ -90,7 +90,7 @@ public class CommandClientBuilder {
    * @return the builder
    */
   @NotNull
-  public CommandClientBuilder setPlugin(@NotNull JavaPlugin plugin) {
+  public CommandClientBuilder setPlugin(@NotNull final JavaPlugin plugin) {
     Preconditions.checkNotNull(plugin, "Plugin may not be null");
     this.plugin = plugin;
     return this;
@@ -105,7 +105,7 @@ public class CommandClientBuilder {
    * @see #setPlugin(JavaPlugin)
    */
   @NotNull
-  public CommandClientBuilder setPlugin(@NotNull Class<? extends JavaPlugin> clazz) {
+  public CommandClientBuilder setPlugin(@NotNull final Class<? extends JavaPlugin> clazz) {
     Preconditions.checkNotNull(clazz, "Clazz may not be null");
     return setPlugin(JavaPlugin.getPlugin(clazz));
   }
@@ -118,7 +118,7 @@ public class CommandClientBuilder {
    * @see InvalidArgumentHandler
    */
   @NotNull
-  public CommandClientBuilder setArgumentHandler(@NotNull InvalidArgumentHandler argumentHandler) {
+  public CommandClientBuilder setArgumentHandler(@NotNull final InvalidArgumentHandler argumentHandler) {
     Preconditions.checkNotNull(argumentHandler, "Argument handler may not be null");
     this.argumentHandler = argumentHandler;
     return this;
@@ -132,7 +132,7 @@ public class CommandClientBuilder {
    * @see NoPermissionHandler
    */
   @NotNull
-  public CommandClientBuilder setNoPermissionHandler(NoPermissionHandler noPermissionHandler) {
+  public CommandClientBuilder setNoPermissionHandler(final NoPermissionHandler noPermissionHandler) {
     this.noPermissionHandler = noPermissionHandler;
     return this;
   }

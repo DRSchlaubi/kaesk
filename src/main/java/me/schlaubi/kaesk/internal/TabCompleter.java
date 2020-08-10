@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
+import me.schlaubi.kaesk.internal.CommandUtils.CommandContainer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -14,61 +15,64 @@ public class TabCompleter {
   private final Map<Class<?>, ArgumentDeserializer<?>> deserializers;
 
   public TabCompleter(
-      Map<Class<?>, ArgumentDeserializer<?>> deserializers) {
+      final Map<Class<?>, ArgumentDeserializer<?>> deserializers) {
     this.deserializers = deserializers;
   }
 
   @SuppressWarnings("unused")
-    /* package-private */ List<String> onTabComplete(CompiledCommandClass compiledCommand,
-      CommandSender sender,
-      Command command, String alias, String[] args) {
-    List<String> possibleArgs = findArgs(compiledCommand, args, sender);
+    /* package-private */ List<String> onTabComplete(final CompiledCommandClass compiledCommand,
+      final CommandSender sender,
+      final Command command, final String alias, final String[] args) {
+    final List<String> possibleArgs = findArgs(compiledCommand, args, sender);
     return possibleArgs.stream()
         .filter(it -> it.toUpperCase().startsWith(args[args.length - 1].toUpperCase()))
-        .collect(Collectors.toUnmodifiableList());
+        .collect(Collectors.toList());
   }
 
   private List<String> findArgs(CompiledCommandClass compiledCommand,
       String[] args, CommandSender sender) {
-    var commandContainer = CommandUtils.findCommandInvokable(compiledCommand, args);
-    var invoke = commandContainer.getInvoke();
-    if (!sender.hasPermission(invoke.permission())) {
+    final CommandContainer commandContainer = CommandUtils
+        .findCommandInvokable(compiledCommand, args);
+    final CommandInvokable invoke = commandContainer.getInvoke();
+    if (!sender.hasPermission(invoke.getPermission())) {
       return Collections.emptyList();
     }
     CommandParameter currentParameter = findCurrentParameter(invoke, args.length);
 
     if (currentParameter == null) {
-      var secondTry = findCurrentParameter(invoke, args.length + 1);
+      final CommandParameter secondTry = findCurrentParameter(invoke, args.length + 1);
       if (secondTry == null) {
         return Collections.emptyList();
       }
       currentParameter = secondTry;
     }
 
-    var currentType = currentParameter.type();
-    var converter = deserializers.get(currentType);
-    var possible = converter
-        .providePossibilities(currentParameter.name(), currentParameter.isVarArg(), currentType);
+    final Class<?> currentType = currentParameter.getType();
+    final ArgumentDeserializer<?> converter = CommandUtils
+        .findDeserializer(deserializers, currentParameter);
+    List<String> possible = converter
+        .providePossibilities(currentParameter.getName(), currentParameter.isVarArg(), currentType);
     if (args.length >= 1) {
-      var list = new ArrayList<>(possible);
+      final List<String> list = new ArrayList<>(possible);
       list.addAll(commandContainer.getTreeElement().getChildren().entrySet().stream()
           .filter(it -> it.getValue().getLevel() == args.length
               && it.getValue().getInvokables().stream()
-              .anyMatch(child -> child.permission().isBlank() || sender
-                  .hasPermission(child.permission()))).map(Map.Entry::getKey)
-          .collect(Collectors.toUnmodifiableList()));
+              .anyMatch(child -> child.getPermission().isEmpty() || sender
+                  .hasPermission(child.getPermission()))).map(Map.Entry::getKey)
+          .collect(Collectors.toList()));
       possible = Collections.unmodifiableList(list);
     }
     return possible;
   }
 
-  private CommandParameter findCurrentParameter(CommandInvokable invoke, int argsLength) {
-    var parameters = invoke.parameters();
+  private CommandParameter findCurrentParameter(final CommandInvokable invoke,
+      final int argsLength) {
+    final List<CommandParameter> parameters = invoke.getParameters();
     if (argsLength > parameters.size()) {
       if (parameters.isEmpty()) {
         return null;
       }
-      var parameter = parameters.get(parameters.size() - 1);
+      final CommandParameter parameter = parameters.get(parameters.size() - 1);
       if (!parameter.isVarArg()) {
         return null;
       }
@@ -77,5 +81,4 @@ public class TabCompleter {
       return parameters.get(argsLength - 1);
     }
   }
-
 }

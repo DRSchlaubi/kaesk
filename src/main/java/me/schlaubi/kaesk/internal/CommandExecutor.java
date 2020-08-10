@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import me.schlaubi.kaesk.api.NoPermissionHandler;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
 import me.schlaubi.kaesk.api.ArgumentException;
 import me.schlaubi.kaesk.api.InvalidArgumentHandler;
+import me.schlaubi.kaesk.api.NoPermissionHandler;
 import me.schlaubi.kaesk.internal.CommandUtils.CommandContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -22,31 +22,32 @@ class CommandExecutor {
 
   private final Map<Class<?>, ArgumentDeserializer<?>> deserializers;
   private final InvalidArgumentHandler argumentHandler;
-  private NoPermissionHandler noPermissionHandler;
+  private final NoPermissionHandler noPermissionHandler;
 
   public CommandExecutor(
-      @NotNull Map<Class<?>, ArgumentDeserializer<?>> deserializers,
-      @NotNull InvalidArgumentHandler argumentHandler,
-      NoPermissionHandler noPermissionHandler) {
+      @NotNull final Map<Class<?>, ArgumentDeserializer<?>> deserializers,
+      @NotNull final InvalidArgumentHandler argumentHandler,
+      final NoPermissionHandler noPermissionHandler) {
     this.deserializers = deserializers;
     this.argumentHandler = argumentHandler;
     this.noPermissionHandler = noPermissionHandler;
   }
 
   @SuppressWarnings("unused")
-    /* package-private */ boolean onCommand(@NotNull CompiledCommandClass compiledCommand,
-      @NotNull CommandSender sender,
-      @NotNull Command command, @NotNull String label, @NotNull final String[] args) {
-    CommandContainer commandContainer = CommandUtils.findCommandInvokable(compiledCommand, args);
-    CommandInvokable invoke = commandContainer.getInvoke();
+    /* package-private */ boolean onCommand(@NotNull final CompiledCommandClass compiledCommand,
+      @NotNull final CommandSender sender,
+      @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
+    final CommandContainer commandContainer = CommandUtils
+        .findCommandInvokable(compiledCommand, args);
+    final CommandInvokable invoke = commandContainer.getInvoke();
 
-    if (!invoke.consoleAllowed() && sender instanceof ConsoleCommandSender) {
+    if (!invoke.isConsoleAllowed() && sender instanceof ConsoleCommandSender) {
       sender.sendMessage("This command is not allowed in console");
       return true;
     }
 
-    var permission = invoke.permission();
-    if (!permission.isBlank() && !sender.hasPermission(permission)) {
+    final String permission = invoke.getPermission();
+    if (!permission.isEmpty() && !sender.hasPermission(permission)) {
       noPermissionHandler.handleNoPermissions(sender, permission);
       return true;
     }
@@ -58,10 +59,10 @@ class CommandExecutor {
       argumentHandler.handleInvalidArgument(e, sender);
       return true;
     }
-    if (invoke.consoleAllowed()) {
+    if (invoke.isConsoleAllowed()) {
       convertedArgs.add(0, sender);
     } else {
-      Player player = (Player) sender;
+      final Player player = (Player) sender;
       convertedArgs.add(0, player);
     }
     try {
@@ -74,30 +75,31 @@ class CommandExecutor {
   }
 
   @NotNull
-  private List<Object> convertArgs(@NotNull String[] _args, @NotNull CommandInvokable invokable) {
-    int parameterSize = invokable.parameters().size();
+  private List<Object> convertArgs(@NotNull String[] _args,
+      @NotNull final CommandInvokable invokable) {
+    final int parameterSize = invokable.getParameters().size();
     if (parameterSize == 0) {
       _args = new String[0];
     }
-    if (_args.length > parameterSize && !invokable.parameters().get(parameterSize - 1).isVarArg()) {
+    if (_args.length > parameterSize && !invokable.getParameters().get(parameterSize - 1).isVarArg()) {
       _args = Arrays.copyOfRange(_args, 0, parameterSize);
     }
     final String[] args = _args;
-    return invokable.parameters().stream().map(parameter -> {
-      var converter = deserializers.get(parameter.type());
+    return invokable.getParameters().stream().map(parameter -> {
+      final ArgumentDeserializer<?> converter = CommandUtils.findDeserializer(deserializers, parameter);
       if (parameter.isVarArg()) {
-        var input = Arrays
-            .copyOfRange(args, invokable.parameters().indexOf(parameter), args.length);
-        if (!converter.varargIsValid(input, parameter.type())) {
-          throw new ArgumentException("Invalid parameter input ", converter, parameter.type());
+        final String[] input = Arrays
+            .copyOfRange(args, invokable.getParameters().indexOf(parameter), args.length);
+        if (!converter.varargIsValid(input, parameter.getType())) {
+          throw new ArgumentException("Invalid parameter input ", converter, parameter.getType());
         }
-        return converter.deserializeVararg(input, parameter.type());
+        return converter.deserializeVararg(input, parameter.getType());
       } else {
-        var input = args[invokable.parameters().indexOf(parameter)];
-        if (!converter.isValid(input, parameter.type())) {
-          throw new ArgumentException("Invalid parameter input ", converter, parameter.type());
+        final String input = args[invokable.getParameters().indexOf(parameter)];
+        if (!converter.isValid(input, parameter.getType())) {
+          throw new ArgumentException("Invalid parameter input ", converter, parameter.getType());
         }
-        return converter.deserialize(input, parameter.type());
+        return converter.deserialize(input, parameter.getType());
       }
     }).collect(Collectors.toList());
   }

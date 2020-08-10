@@ -19,16 +19,15 @@ class DelegatingCommand implements CommandExecutor, TabExecutor {
   }
 
   @Override
-  public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-      @NotNull String label, @NotNull String[] args) {
+  public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command,
+      @NotNull final String label, @NotNull final String[] args) {
     return commandClient.onCommand(compiledCommand, sender, command, label, args);
   }
 
   @NotNull
   @Override
-  public List<String> onTabComplete(@NotNull CommandSender sender,
-      @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+  public List<String> onTabComplete(@NotNull final CommandSender sender,
+      @NotNull final Command command, @NotNull final String alias, @NotNull final String[] args) {
     return commandClient.onTabComplete(compiledCommand, sender, command, alias, args);
   }
-
 }

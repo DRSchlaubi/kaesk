@@ -17,6 +17,16 @@ public interface CommandClient {
   void registerCommand(@NotNull Object command);
 
   /**
+   * Registers a list of commands
+   * @param commands a list of command executors.
+   */
+  default void registerCommands(@NotNull Object... commands) {
+    for (Object command : commands) {
+      registerCommand(command);
+    }
+  }
+
+  /**
    * Unregisters a command.
    *
    * @param name the name of the command to unregister

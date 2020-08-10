@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class GameModePlugin extends JavaPlugin {
 
+  @SuppressWarnings("FieldCanBeLocal") // does not matter here
   private CommandClient commandClient;
 
   @Override
@@ -14,12 +15,13 @@ public class GameModePlugin extends JavaPlugin {
         // no longer needed since this is registered by default
 //        .addDeserializer(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new))
         .setArgumentHandler((error, sender) -> sender.sendMessage(
-            "Place enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
+            "Please enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
         .setNoPermissionHandler((sender, permission) -> sender.sendMessage("You need the permission %s to proceed".formatted(permission)))
         .build();
     commandClient.registerCommand(new GameModeCommand());
     commandClient.registerCommand(new SayCommand());
     commandClient.registerCommand(new SumCommand());
     commandClient.registerCommand(new SubSubTestCommand());
+    commandClient.registerCommand(new VanishCommand(this));
   }
 }

@@ -1,15 +1,19 @@
 import com.jfrog.bintray.gradle.BintrayExtension
+import java.net.URL
 
 plugins {
     java
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
+    kotlin("jvm") version "1.3.72"
+    id("org.jetbrains.dokka") version "1.4.0-rc"
 }
 
 group = "me.schlaubi"
-version = "1.1"
+version = "1.2"
 
 repositories {
+    jcenter()
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
@@ -19,20 +23,20 @@ dependencies {
     implementation("org.jetbrains", "annotations", "19.0.0")
     compileOnly("org.spigotmc", "spigot-api", "1.15.2-R0.1-SNAPSHOT")
 
+    compileOnly(kotlin("stdlib-jdk8"))
+
     // Tests
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.6.0")
-    testImplementation("org.spigotmc", "spigot-api", "1.15.2-R0.1-SNAPSHOT")
+    testImplementation("org.spigotmc", "spigot-api", "1.16.1-R0.1-SNAPSHOT")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.6.0")
-
+    testImplementation("org.mockito:mockito-core:2.+")
 }
 
-val javaComponent = components["java"]
+val javaComponent: SoftwareComponent = components["java"]
 
 tasks {
     test {
         useJUnitPlatform()
-        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION") // Seems like it is needed
-        jvmArgs!!.add("--enable-preview")
     }
 
 
@@ -42,20 +46,12 @@ tasks {
         from(sourceSets["main"].allSource)
     }
 
-    val buildJavadoc = task<Exec>("buildJavadoc") {
-        executable = System.getProperty("java.home") + "/bin/javadoc"
-        args("--enable-preview", "-source", "14", "-sourcepath", "src/main/java", "-d", "./docs", "-subpackages", "me.schlaubi.kaesk", "--class-path", compileJava.get().classpath.asPath, "-tag", "implNote:a:Implementation Note: ")
-    }
 
     val javadocJar = task<Jar>("javadocJar") {
-        dependsOn(buildJavadoc)
+        dependsOn(dokkaHtml)
         group = JavaBasePlugin.DOCUMENTATION_GROUP
         archiveClassifier.set("javadoc")
-        from(project.files("docs"))
-    }
-
-    withType<JavaCompile> {
-        options.compilerArgs.add("--enable-preview")
+        from(dokkaHtml)
     }
 
     publishing {
@@ -64,6 +60,36 @@ tasks {
                 from(javaComponent)
                 artifact(sourcesJar)
                 artifact(javadocJar)
+            }
+        }
+    }
+
+    compileTestJava {
+        targetCompatibility = "11"
+        sourceCompatibility = "11"
+    }
+
+    dokkaHtml {
+        outputDirectory = "docs/"
+
+        dokkaSourceSets {
+            configureEach {
+                includeNonPublic = false
+
+                sourceLink {
+                    path = "src"
+
+                    url = "https://github.com/DRSchlaubi/kaesk/tree/master/src"
+
+                    lineSuffix = "#L"
+                }
+
+                jdkVersion = 8
+
+                // seems to bee bugged in this version
+//                externalDocumentationLink {
+//                    url = URL("https://hub.spigotmc.org/javadocs/spigot/")
+//                }
             }
         }
     }
@@ -89,7 +115,7 @@ bintray {
 }
 
 configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_14
+    sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
 fun BintrayExtension.pkg(block: BintrayExtension.PackageConfig.() -> Unit) = pkg(delegateClosureOf(block))

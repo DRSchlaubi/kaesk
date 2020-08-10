@@ -2,6 +2,7 @@ package me.schlaubi.kaesk.api.converters;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -66,14 +67,16 @@ public class Converters {
    */
   public static final ArgumentDeserializer<OfflinePlayer> OFFLINE_PLAYER = new OfflinePlayerDeserializer();
 
-  public static final ArgumentDeserializer<String> STRING = new ArgumentDeserializer<>() {
+  public static final ArgumentDeserializer<String> STRING = new ArgumentDeserializer<String>() {
+
     @Override
     public boolean isValid(@NotNull String input, @NotNull Class<?> clazz) {
       return true;
     }
 
+    @NotNull
     @Override
-    public @NotNull String deserialize(@NotNull String input, @NotNull Class<?> clazz) {
+    public String deserialize(@NotNull String input, @NotNull Class<?> clazz) {
       return input;
     }
 
@@ -83,12 +86,13 @@ public class Converters {
     }
 
     @Override
-    public boolean varargIsValid(String[] args, Class<?> clazz) {
+    public boolean varargIsValid(@NotNull String[] args, @NotNull Class<?> clazz) {
       return true;
     }
 
+    @NotNull
     @Override
-    public String[] deserializeVararg(String[] args, @NotNull Class<?> clazz) {
+    public String[] deserializeVararg(@NotNull String[] args, @NotNull Class<?> clazz) {
       return args;
     }
   };
@@ -103,7 +107,7 @@ public class Converters {
    * @see me.schlaubi.kaesk.api.CommandClientBuilder#addDeserializer(Class, ArgumentDeserializer)
    */
   public static <T extends Enum<T>> ArgumentDeserializer<T> newEnumDeserializer(
-      IntFunction<T[]> arrayGenerator) {
+      final IntFunction<T[]> arrayGenerator) {
     return new EnumDeserializer<>(arrayGenerator);
   }
 
@@ -118,22 +122,21 @@ public class Converters {
     }
 
     @Override
-    public boolean varargIsValid(String[] args, Class<?> clazz) {
+    public boolean varargIsValid(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       return Arrays.stream(args).allMatch(arg -> NAME_PATTERN.matcher(arg).matches());
     }
 
     @Override
-    public boolean isValid(@NotNull String input, @NotNull Class<?> clazz) {
+    public boolean isValid(@NotNull final String input, @NotNull final Class<?> clazz) {
       return NAME_PATTERN.matcher(input).matches();
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
-    public @NotNull List<String> providePossibilities(@NotNull String parameterName,
-        boolean isVarArg,
-        Class<?> clazz) {
-      return getPlayers().stream().map(OfflinePlayer::getName)
-          .collect(Collectors.toUnmodifiableList());
+    public @NotNull List<String> providePossibilities(@NotNull final String parameterName,
+        final boolean isVarArg,
+        final Class<?> clazz) {
+      return Collections.unmodifiableList(getPlayers().stream().map(OfflinePlayer::getName)
+          .collect(Collectors.toList()));
     }
 
     protected abstract Collection<? extends OfflinePlayer> getPlayers();
@@ -142,7 +145,7 @@ public class Converters {
   private static final class OnlinePlayerDeserializer extends PlayerDeserializer<Player> {
 
     @Override
-    public boolean varargIsValid(String[] args, Class<?> clazz) {
+    public boolean varargIsValid(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       if (super.varargIsValid(args, clazz)) {
         return Arrays.stream(args).allMatch(name -> Bukkit.getPlayer(name) != null);
       }
@@ -150,7 +153,7 @@ public class Converters {
     }
 
     @Override
-    public boolean isValid(@NotNull String input, @NotNull Class<?> clazz) {
+    public boolean isValid(@NotNull final String input, @NotNull final Class<?> clazz) {
       if (super.isValid(input, clazz)) {
         return Bukkit.getPlayer(input) != null;
       }
@@ -158,12 +161,12 @@ public class Converters {
     }
 
     @Override
-    public @NotNull Player deserialize(@NotNull String input, @NotNull Class<?> clazz) {
+    public @NotNull Player deserialize(@NotNull final String input, @NotNull final Class<?> clazz) {
       return Objects.requireNonNull(Bukkit.getPlayer(input));
     }
 
     @Override
-    public Player[] deserializeVararg(String[] args, @NotNull Class<?> clazz) {
+    public Player[] deserializeVararg(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       return Arrays.stream(args).map(Bukkit::getPlayer).toArray(Player[]::new);
     }
 
@@ -177,19 +180,19 @@ public class Converters {
 
     @SuppressWarnings("deprecation")
     @Override
-    public @NotNull OfflinePlayer deserialize(@NotNull String input, @NotNull Class<?> clazz) {
+    public @NotNull OfflinePlayer deserialize(@NotNull final String input, @NotNull final Class<?> clazz) {
       return Bukkit.getOfflinePlayer(input);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public OfflinePlayer[] deserializeVararg(String[] args, @NotNull Class<?> clazz) {
+    public OfflinePlayer[] deserializeVararg(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       return Arrays.stream(args).map(Bukkit::getOfflinePlayer).toArray(OfflinePlayer[]::new);
     }
 
     @Override
     protected Collection<? extends OfflinePlayer> getPlayers() {
-      return List.of(Bukkit.getOfflinePlayers());
+      return Collections.unmodifiableCollection(Arrays.asList(Bukkit.getOfflinePlayers()));
     }
   }
 
@@ -200,8 +203,8 @@ public class Converters {
     private T output;
     private T[] varArgOutput;
 
-    private NumberDeserializer(Function<String, T> parser,
-        IntFunction<T[]> arrayGenerator) {
+    private NumberDeserializer(final Function<String, T> parser,
+        final IntFunction<T[]> arrayGenerator) {
       this.parser = parser;
       this.arrayGenerator = arrayGenerator;
     }
@@ -212,7 +215,7 @@ public class Converters {
     }
 
     @Override
-    public boolean varargIsValid(String[] args, Class<?> clazz) {
+    public boolean varargIsValid(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       try {
         varArgOutput = Arrays.stream(args).map(parser).toArray(arrayGenerator);
         return true;
@@ -222,7 +225,7 @@ public class Converters {
     }
 
     @Override
-    public boolean isValid(@NotNull String input, @NotNull Class<?> clazz) {
+    public boolean isValid(@NotNull final String input, @NotNull final Class<?> clazz) {
       try {
         output = parser.apply(input);
         return true;
@@ -232,7 +235,7 @@ public class Converters {
     }
 
     @Override
-    public @NotNull T deserialize(@NotNull String input, @NotNull Class<?> clazz) {
+    public @NotNull T deserialize(@NotNull final String input, @NotNull final Class<?> clazz) {
       if (output == null) {
         throw new IllegalStateException(
             "This method is not supposed to be called when isValid returned false");
@@ -241,7 +244,7 @@ public class Converters {
     }
 
     @Override
-    public T[] deserializeVararg(String[] args, @NotNull Class<?> clazz) {
+    public T[] deserializeVararg(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       if (varArgOutput == null) {
         throw new IllegalStateException(
             "This method is not supposed to be called when isValid returned false");
@@ -251,23 +254,23 @@ public class Converters {
   }
 
 
-  private static class EnumDeserializer<T extends Enum<T>> implements ArgumentDeserializer<T> {
+  private static final class EnumDeserializer<T extends Enum<T>> implements ArgumentDeserializer<T> {
 
     private final IntFunction<T[]> arrayGenerator;
 
-    private EnumDeserializer(IntFunction<T[]> arrayGenerator) {
+    private EnumDeserializer(final IntFunction<T[]> arrayGenerator) {
       this.arrayGenerator = arrayGenerator;
     }
 
     @Override
-    public boolean isValid(@NotNull String input, @NotNull Class<?> clazz) {
+    public boolean isValid(@NotNull final String input, @NotNull final Class<?> clazz) {
       return Arrays.stream(clazz.getEnumConstants()).anyMatch(it -> it.toString().equals(input));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NotNull T deserialize(@NotNull String input, @NotNull Class<?> clazz) {
-      var klass = (Class<T>) clazz;
+    public @NotNull T deserialize(@NotNull final String input, @NotNull final Class<?> clazz) {
+      Class<T> klass = (Class<T>) clazz;
       return Enum.valueOf(klass, input);
     }
 
@@ -277,26 +280,26 @@ public class Converters {
     }
 
     @Override
-    public boolean varargIsValid(String[] args, Class<?> clazz) {
+    public boolean varargIsValid(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       return Arrays.stream(args).allMatch(input -> Arrays.stream(clazz.getEnumConstants())
           .anyMatch(it -> it.toString().equals(input)));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public T[] deserializeVararg(String[] args, @NotNull Class<?> clazz) {
+    public T[] deserializeVararg(@NotNull final String[] args, @NotNull final Class<?> clazz) {
       return Arrays.stream(args).map(arg -> {
-        var klass = (Class<T>) clazz;
+        Class<T> klass = (Class<T>) clazz;
         return Enum.valueOf(klass, arg);
       }).toArray(arrayGenerator);
     }
 
     @Override
-    public @NotNull List<String> providePossibilities(@NotNull String parameterName,
-        boolean isVarArg,
-        Class<?> clazz) {
-      return Arrays.stream(clazz.getEnumConstants()).map(Object::toString)
-          .collect(Collectors.toUnmodifiableList());
+    public @NotNull List<String> providePossibilities(@NotNull final String parameterName,
+        final boolean isVarArg,
+        final Class<?> clazz) {
+      return Collections.unmodifiableList(Arrays.stream(clazz.getEnumConstants()).map(Object::toString)
+          .collect(Collectors.toList()));
     }
   }
 }

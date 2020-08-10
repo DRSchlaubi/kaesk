@@ -12,8 +12,8 @@ public class CommandTreeElement {
   private final int level;
 
   public CommandTreeElement(
-      @NotNull Map<String, CommandTreeElement> children,
-      @NotNull List<CommandInvokable> invokables, int level) {
+      @NotNull final Map<String, CommandTreeElement> children,
+      @NotNull final List<CommandInvokable> invokables, int level) {
     this.children = children;
     this.invokables = invokables;
     this.level = level;
@@ -25,7 +25,7 @@ public class CommandTreeElement {
   }
 
   @Nullable
-  public CommandTreeElement findChild(String name) {
+  public CommandTreeElement findChild(final String name) {
     return children.get(name);
   }
 

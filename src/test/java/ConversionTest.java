@@ -135,7 +135,7 @@ public class ConversionTest {
       Class<?> clazz) {
     var args = input.split("\\s+");
     Assertions.assertEquals(isValid, deserializer.varargIsValid(args, clazz),
-        "Is valid is expected to be %s".formatted(isValid));
+        String.format("Is valid is expected to be %s", isValid));
     if (!isValid) {
       return null;
     }
@@ -154,11 +154,10 @@ public class ConversionTest {
   private <T> T test(String input, ArgumentDeserializer<T> deserializer, boolean isValid,
       Class<?> clazz) {
     Assertions.assertEquals(isValid, deserializer.isValid(input, clazz),
-        "Is valid is expected to be %s".formatted(isValid));
+        String.format("Is valid is expected to be %s", isValid));
     if (!isValid) {
       return null;
     }
     return deserializer.deserialize(input, clazz);
   }
-
 }

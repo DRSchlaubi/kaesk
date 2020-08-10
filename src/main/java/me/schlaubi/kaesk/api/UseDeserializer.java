@@ -5,21 +5,17 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.jetbrains.annotations.NotNull;
 
 /**
- * Annotations that can be used to specify parameter options.
+ * Specifies the {@link ArgumentDeserializer} to use.
  */
 @Documented
-@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CommandArgument {
+@Target(ElementType.PARAMETER)
+public @interface UseDeserializer {
 
   /**
-   * The name of the parameter in help messages.
-   *
-   * @return the name
+   * @return the {@link Class} declaring the {@link ArgumentDeserializer} to use.
    */
-  @NotNull
-  String name();
+  Class<? extends ArgumentDeserializer<?>> value();
 }

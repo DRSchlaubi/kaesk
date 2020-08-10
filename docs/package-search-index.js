@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"me.schlaubi.kaesk.api"},{"l":"me.schlaubi.kaesk.api.converters"},{"l":"me.schlaubi.kaesk.internal"}]

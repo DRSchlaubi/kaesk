@@ -46,7 +46,7 @@ Register the command
             // no longer needed since this is registered by default
     //        .addDeserializer(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new))
             .setArgumentHandler((error, sender) -> sender.sendMessage(
-                "Place enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
+                "Please enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
             .setNoPermissionHandler((sender, permission) -> sender.sendMessage("You need the permission %s to proceed".formatted(permission)))
             .build();
     commandClient.registerCommand(new SumCommand());
@@ -56,7 +56,7 @@ Register the command
 For more information take a look at the example [here](https://github.com/DRSchlaubi/kaesk/tree/master/example)
 
 ## Javadoc
-The completely ugly javadoc (thx oracle) can be found [here](https://drschlaubi.github.io/mgisdumb)
+The very fancy kdoc (thx jetbrains) can be found [here](https://p.mik.wtf/kaesk)
 
 ## Download
 You can get the latest version from [bintray](https://bintray.com/drschlaubi/maven/kaesk)
