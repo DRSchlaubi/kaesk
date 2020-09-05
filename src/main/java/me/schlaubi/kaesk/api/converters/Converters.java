@@ -4,15 +4,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import me.schlaubi.kaesk.api.AbstractCommandClientBuilder;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -57,16 +54,6 @@ public class Converters {
       Short::parseShort, Short[]::new
   );
 
-  /**
-   * Converter for Player.
-   */
-  public static final ArgumentDeserializer<Player> PLAYER = new OnlinePlayerDeserializer();
-
-  /**
-   * Converter for OfflinePlayer.
-   */
-  public static final ArgumentDeserializer<OfflinePlayer> OFFLINE_PLAYER = new OfflinePlayerDeserializer();
-
   public static final ArgumentDeserializer<String> STRING = new ArgumentDeserializer<String>() {
 
     @Override
@@ -104,96 +91,11 @@ public class Converters {
    * @param arrayGenerator an array generator for the enum type
    * @param <T> the type of the enum
    * @return the new deserializer
-   * @see me.schlaubi.kaesk.api.CommandClientBuilder#addDeserializer(Class, ArgumentDeserializer)
+   * @see AbstractCommandClientBuilder#addDeserializer(Class, ArgumentDeserializer)
    */
   public static <T extends Enum<T>> ArgumentDeserializer<T> newEnumDeserializer(
       final IntFunction<T[]> arrayGenerator) {
     return new EnumDeserializer<>(arrayGenerator);
-  }
-
-  private static abstract class PlayerDeserializer<T extends OfflinePlayer> implements
-      ArgumentDeserializer<T> {
-
-    private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_]{3,16}");
-
-    @Override
-    public boolean supportsVararg() {
-      return true;
-    }
-
-    @Override
-    public boolean varargIsValid(@NotNull final String[] args, @NotNull final Class<?> clazz) {
-      return Arrays.stream(args).allMatch(arg -> NAME_PATTERN.matcher(arg).matches());
-    }
-
-    @Override
-    public boolean isValid(@NotNull final String input, @NotNull final Class<?> clazz) {
-      return NAME_PATTERN.matcher(input).matches();
-    }
-
-    @Override
-    public @NotNull List<String> providePossibilities(@NotNull final String parameterName,
-        final boolean isVarArg,
-        final Class<?> clazz) {
-      return Collections.unmodifiableList(getPlayers().stream().map(OfflinePlayer::getName)
-          .collect(Collectors.toList()));
-    }
-
-    protected abstract Collection<? extends OfflinePlayer> getPlayers();
-  }
-
-  private static final class OnlinePlayerDeserializer extends PlayerDeserializer<Player> {
-
-    @Override
-    public boolean varargIsValid(@NotNull final String[] args, @NotNull final Class<?> clazz) {
-      if (super.varargIsValid(args, clazz)) {
-        return Arrays.stream(args).allMatch(name -> Bukkit.getPlayer(name) != null);
-      }
-      return false;
-    }
-
-    @Override
-    public boolean isValid(@NotNull final String input, @NotNull final Class<?> clazz) {
-      if (super.isValid(input, clazz)) {
-        return Bukkit.getPlayer(input) != null;
-      }
-      return false;
-    }
-
-    @Override
-    public @NotNull Player deserialize(@NotNull final String input, @NotNull final Class<?> clazz) {
-      return Objects.requireNonNull(Bukkit.getPlayer(input));
-    }
-
-    @Override
-    public Player[] deserializeVararg(@NotNull final String[] args, @NotNull final Class<?> clazz) {
-      return Arrays.stream(args).map(Bukkit::getPlayer).toArray(Player[]::new);
-    }
-
-    @Override
-    protected Collection<? extends OfflinePlayer> getPlayers() {
-      return Bukkit.getOnlinePlayers();
-    }
-  }
-
-  private static final class OfflinePlayerDeserializer extends PlayerDeserializer<OfflinePlayer> {
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public @NotNull OfflinePlayer deserialize(@NotNull final String input, @NotNull final Class<?> clazz) {
-      return Bukkit.getOfflinePlayer(input);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public OfflinePlayer[] deserializeVararg(@NotNull final String[] args, @NotNull final Class<?> clazz) {
-      return Arrays.stream(args).map(Bukkit::getOfflinePlayer).toArray(OfflinePlayer[]::new);
-    }
-
-    @Override
-    protected Collection<? extends OfflinePlayer> getPlayers() {
-      return Collections.unmodifiableCollection(Arrays.asList(Bukkit.getOfflinePlayers()));
-    }
   }
 
   private static final class NumberDeserializer<T> implements ArgumentDeserializer<T> {
@@ -254,7 +156,8 @@ public class Converters {
   }
 
 
-  private static final class EnumDeserializer<T extends Enum<T>> implements ArgumentDeserializer<T> {
+  private static final class EnumDeserializer<T extends Enum<T>> implements
+      ArgumentDeserializer<T> {
 
     private final IntFunction<T[]> arrayGenerator;
 
@@ -298,8 +201,47 @@ public class Converters {
     public @NotNull List<String> providePossibilities(@NotNull final String parameterName,
         final boolean isVarArg,
         final Class<?> clazz) {
-      return Collections.unmodifiableList(Arrays.stream(clazz.getEnumConstants()).map(Object::toString)
+      return Collections
+          .unmodifiableList(Arrays.stream(clazz.getEnumConstants()).map(Object::toString)
+              .collect(Collectors.toList()));
+    }
+  }
+
+
+  public static abstract class PlayerDeserializer<T> implements
+      ArgumentDeserializer<T> {
+
+    private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_]{3,16}");
+    private final Function<T, String> nameFinder;
+
+    protected PlayerDeserializer(Function<T, String> nameFinder) {
+      this.nameFinder = nameFinder;
+    }
+
+    @Override
+    public boolean supportsVararg() {
+      return true;
+    }
+
+    @Override
+    public boolean varargIsValid(@NotNull final String[] args, @NotNull final Class<?> clazz) {
+      return Arrays.stream(args).allMatch(arg -> NAME_PATTERN.matcher(arg).matches());
+    }
+
+    @Override
+    public boolean isValid(@NotNull final String input, @NotNull final Class<?> clazz) {
+      return NAME_PATTERN.matcher(input).matches();
+    }
+
+    @Override
+    public @NotNull List<String> providePossibilities(@NotNull final String parameterName,
+        final boolean isVarArg,
+        final Class<?> clazz) {
+      return Collections.unmodifiableList(getPlayers().stream().map(nameFinder)
           .collect(Collectors.toList()));
     }
+
+
+    protected abstract Collection<? extends T> getPlayers();
   }
 }

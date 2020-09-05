@@ -1,17 +1,17 @@
 package me.schlaubi.kaesk;
 
-import me.schlaubi.kaesk.api.CommandClient;
-import me.schlaubi.kaesk.api.CommandClientBuilder;
+import me.schlaubi.kaesk.api.bukkit.BukkitCommandClient;
+import me.schlaubi.kaesk.api.bukkit.BukkitCommandClientBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class GameModePlugin extends JavaPlugin {
 
   @SuppressWarnings("FieldCanBeLocal") // does not matter here
-  private CommandClient commandClient;
+  private BukkitCommandClient commandClient;
 
   @Override
   public void onEnable() {
-    commandClient = new CommandClientBuilder(this)
+    commandClient = new BukkitCommandClientBuilder(this)
         // no longer needed since this is registered by default
 //        .addDeserializer(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new))
         .setArgumentHandler((error, sender) -> sender.sendMessage(

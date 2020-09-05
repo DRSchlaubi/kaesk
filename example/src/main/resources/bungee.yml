@@ -1,0 +1,6 @@
+main: me.schlaubi.kaesk.BungeePlugin
+name: BungeePlugin
+version: '1.0'
+author: mik
+commands:
+  guild:

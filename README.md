@@ -38,67 +38,18 @@ public void subCommand(Player player, @CommandParameter(name = "playerName") Str
 }
 ```
 
-Register the command
-```java
-  @Override
-  public void onEnable() {
-    commandClient = new CommandClientBuilder(this)
-            // no longer needed since this is registered by default
-    //        .addDeserializer(GameMode.class, Converters.newEnumDeserializer(GameMode[]::new))
-            .setArgumentHandler((error, sender) -> sender.sendMessage(
-                "Please enter a valid %s!".formatted(error.getParameterType().getSimpleName())))
-            .setNoPermissionHandler((sender, permission) -> sender.sendMessage("You need the permission %s to proceed".formatted(permission)))
-            .build();
-    commandClient.registerCommand(new SumCommand());
-  }
-```
+## Modules
+- [Bukkit](https://github.com/DRSchlaubi/kaesk/tree/master/bukkit)
+- [Bungee](https://github.com/DRSchlaubi/kaesk/tree/master/bukkit)
+
 
 For more information take a look at the example [here](https://github.com/DRSchlaubi/kaesk/tree/master/example)
 
 ## Javadoc
-The very fancy kdoc (thx jetbrains) can be found [here](https://p.mik.wtf/kaesk)
+The very ~~urgly javadoc (thx oracle)~~ fancy kdoc (thx jetbrains) can be found [here](https://p.mik.wtf/kaesk)
 
 ## Download
-You can get the latest version from [bintray](https://bintray.com/drschlaubi/maven/kaesk)
-### Gradle (Kotlin)
-```kotlin
-repositories {
-    jcenter()
-}
-
-dependencies {
-    implementation("me.schlaubi", "kaesk", "1.1")
-}
-```
-
-### Gradle (Groovy)
-```groovy
-repositories {
-    jcenter()
-}
-
-dependencies {
-    implementation 'me.schlaubi:kaesk:1.1"'
-}
-```
-
-### Maven
-```xml
-<repositories>
-  <repository>
-    <name>jcenter</name>
-    <url>https://jcenter.bintray.com</url>
-  </repository>
-</repositories>
-
-<dependencies>
-  <dependency>
-    <groupId>me.schlaubi</groupId>
-    <artifactId>kaesk</artifactId>
-    <version>1.1</version>
-  </dependency>
-</dependencies>
-```
+ Please download from [Modules](#modules)
 
 ## Credits
 Thanks to [Paul2708](https://github.com/Paul2708) for creating [simple-commands](https://github.com/Paul2708/simple-commands) as I kinda copyed his idea.

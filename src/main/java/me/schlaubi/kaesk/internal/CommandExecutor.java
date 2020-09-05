@@ -1,47 +1,50 @@
 package me.schlaubi.kaesk.internal;
 
+import com.google.common.base.Preconditions;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
 import me.schlaubi.kaesk.api.ArgumentException;
+import me.schlaubi.kaesk.api.CommandSender;
 import me.schlaubi.kaesk.api.InvalidArgumentHandler;
 import me.schlaubi.kaesk.api.NoPermissionHandler;
 import me.schlaubi.kaesk.internal.CommandUtils.CommandContainer;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-class CommandExecutor {
+class CommandExecutor<PLAYER> {
 
   private final Map<Class<?>, ArgumentDeserializer<?>> deserializers;
   private final InvalidArgumentHandler argumentHandler;
   private final NoPermissionHandler noPermissionHandler;
+  private final Class<PLAYER> playerClazz;
+  private final Logger logger;
 
   public CommandExecutor(
       @NotNull final Map<Class<?>, ArgumentDeserializer<?>> deserializers,
       @NotNull final InvalidArgumentHandler argumentHandler,
-      final NoPermissionHandler noPermissionHandler) {
+      @NotNull final NoPermissionHandler noPermissionHandler,
+      @NotNull Class<PLAYER> playerClazz,
+      @NotNull Logger logger) {
     this.deserializers = deserializers;
     this.argumentHandler = argumentHandler;
     this.noPermissionHandler = noPermissionHandler;
+    this.playerClazz = playerClazz;
+    this.logger = logger;
   }
 
   @SuppressWarnings("unused")
     /* package-private */ boolean onCommand(@NotNull final CompiledCommandClass compiledCommand,
-      @NotNull final CommandSender sender,
-      @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
+      @NotNull final CommandSender<?> sender, @NotNull final String label, @NotNull final String[] args) {
     final CommandContainer commandContainer = CommandUtils
         .findCommandInvokable(compiledCommand, args);
     final CommandInvokable invoke = commandContainer.getInvoke();
 
-    if (!invoke.isConsoleAllowed() && sender instanceof ConsoleCommandSender) {
+    if (!invoke.isConsoleAllowed() && sender.isConsole()) {
       sender.sendMessage("This command is not allowed in console");
       return true;
     }
@@ -60,16 +63,16 @@ class CommandExecutor {
       return true;
     }
     if (invoke.isConsoleAllowed()) {
-      convertedArgs.add(0, sender);
+      convertedArgs.add(0, sender.getActual());
     } else {
-      final Player player = (Player) sender;
+      final PLAYER player = playerClazz.cast(sender.getActual());
       convertedArgs.add(0, player);
     }
     try {
       invoke.invoke(convertedArgs.toArray());
       return true;
     } catch (InvocationTargetException | IllegalAccessException e) {
-      Bukkit.getLogger().log(Level.SEVERE, "Error while invoking method", e);
+      logger.log(Level.SEVERE, "Error while invoking method", e);
       return false;
     }
   }
@@ -86,6 +89,7 @@ class CommandExecutor {
     }
     final String[] args = _args;
     return invokable.getParameters().stream().map(parameter -> {
+      Preconditions.checkArgument(args.length > 0, "If you wish to have a default command without any parameters please add one to your command class");
       final ArgumentDeserializer<?> converter = CommandUtils.findDeserializer(deserializers, parameter);
       if (parameter.isVarArg()) {
         final String[] input = Arrays

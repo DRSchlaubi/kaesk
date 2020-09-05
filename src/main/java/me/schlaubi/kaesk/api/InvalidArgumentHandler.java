@@ -1,6 +1,5 @@
 package me.schlaubi.kaesk.api;
 
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,5 +14,5 @@ public interface InvalidArgumentHandler {
    * @param exception the exception that occurred
    * @param sender the {@link CommandSender} that executed the command
    */
-  void handleInvalidArgument(@NotNull ArgumentException exception, @NotNull CommandSender sender);
+  void handleInvalidArgument(@NotNull ArgumentException exception, @NotNull CommandSender<?> sender);
 }

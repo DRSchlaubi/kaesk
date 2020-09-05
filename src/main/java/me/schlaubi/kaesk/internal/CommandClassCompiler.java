@@ -17,22 +17,25 @@ import me.schlaubi.kaesk.api.CommandArgument;
 import me.schlaubi.kaesk.api.CommandClass;
 import me.schlaubi.kaesk.api.CommandParents;
 import me.schlaubi.kaesk.api.UseDeserializer;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class CommandClassCompiler {
 
   private final Map<Class<?>, ArgumentDeserializer<?>> deserializers;
+  private final Class<?> commandSenderClass;
 
   public CommandClassCompiler(
-      @NotNull final Map<Class<?>, ArgumentDeserializer<?>> deserializers) {
+      @NotNull final Map<Class<?>, ArgumentDeserializer<?>> deserializers,
+      Class<?> commandSenderClass) {
     this.deserializers = deserializers;
+    this.commandSenderClass = commandSenderClass;
   }
 
   @NotNull
   public CompiledCommandClass compile(@NotNull final Object executor) {
     final Class<?> clazz = executor.getClass();
+    Preconditions.checkArgument(Modifier.isPublic(clazz.getModifiers()), "Class has to be public!");
     Preconditions.checkArgument(clazz.isAnnotationPresent(CommandClass.class),
         "Class needs to be annotated with @CommandClass!");
     final CommandClass commandClass = clazz.getDeclaredAnnotation(CommandClass.class);
@@ -151,7 +154,7 @@ class CommandClassCompiler {
       @NotNull final Method method) {
     final Parameter first = method.getParameters()[0];
     Preconditions.checkArgument(!invokable.consoleAllowed() || first.getType().getName().equals(
-        CommandSender.class.getName()),
+        commandSenderClass.getName()),
         String.format("If console is allowed first argument has to be CommandSender. Method: %s",
             method));
     return Collections.unmodifiableList(Arrays.stream(method.getParameters())
@@ -220,15 +223,12 @@ class CommandClassCompiler {
     private final Method method;
     @NotNull
     private final Command command;
-    @Nullable
-    private final CommandParents parents;
 
     public PotentialCommand(@NotNull Method method,
         @NotNull Command command,
         @Nullable CommandParents parents) {
       this.method = method;
       this.command = command;
-      this.parents = parents;
     }
 
     public @NotNull Method getMethod() {
@@ -239,8 +239,5 @@ class CommandClassCompiler {
       return command;
     }
 
-    public @Nullable CommandParents getParents() {
-      return parents;
-    }
   }
 }

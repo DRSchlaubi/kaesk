@@ -95,16 +95,16 @@ public class ConversionTest {
     testVarArgFail("not a number", Converters.LONG, Long.class);
   }
 
-  @Test
-  public void testIllegalPlayerNames() {
-    testFail("Inval$id", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
-    testFail("to", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
-    testFail("sh", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
-    testFail("or", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
-    testFail("t", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
-    testVarArgFail("Inval$id id did __ ,,", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
-    testVarArgFail("to sh o rt", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
-  }
+//  @Test
+//  public void testIllegalPlayerNames() {
+//    testFail("Inval$id", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
+//    testFail("to", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
+//    testFail("sh", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
+//    testFail("or", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
+//    testFail("t", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
+//    testVarArgFail("Inval$id id did __ ,,", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
+//    testVarArgFail("to sh o rt", Converters.OFFLINE_PLAYER, OfflinePlayer.class);
+//  }
 
   @Test
   public void testEnums() {

@@ -18,13 +18,13 @@ public class SayCommand {
   @Command(root = true, permission = "example.say", consoleAllowed = true)
   public void rootCommand(CommandSender sender, @CommandArgument(name = "text") String... text) {
     var joined = String.join(" ", text);
-    Bukkit.broadcast(joined, "");
+    Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(joined)); // Bukkit.broadcast is broken on my version
   }
 
   @Command(name = "bold", permission = "example.say", consoleAllowed = true)
   public void bold(CommandSender sender, @CommandArgument(name = "text") String... text) {
     var joined = String.join(" ", text);
-    Bukkit.broadcast(ChatColor.BOLD + joined, "");
+    Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.BOLD + joined));
   }
 
 }

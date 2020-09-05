@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="kaesk.bukkit" target="14" />
+      <module name="kaesk.bukkit.main" target="14" />
+      <module name="kaesk.bukkit.test" target="14" />
+      <module name="kaesk.bungee" target="14" />
+      <module name="kaesk.bungee.main" target="14" />
+      <module name="kaesk.bungee.test" target="14" />
+      <module name="kaesk.kaesk-nukkit.main" target="14" />
+      <module name="kaesk.kaesk-nukkit.test" target="14" />
+    </bytecodeTargetLevel>
   </component>
 </project>

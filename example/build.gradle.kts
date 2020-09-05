@@ -14,9 +14,11 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":"))
+    implementation(project(":kaesk-bukkit"))
+    implementation(project(":kaesk-bungee"))
 
-    compileOnly("org.spigotmc", "spigot-api", "1.15.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc", "spigot-api", "1.16.1-R0.1-SNAPSHOT")
+    compileOnly("net.md-5", "bungeecord-api", "1.16-R0.3")
 }
 
 tasks {

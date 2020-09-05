@@ -1,13 +1,20 @@
 import com.jfrog.bintray.gradle.BintrayExtension
-import java.net.URL
 
 plugins {
     java
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.0"
     id("org.jetbrains.dokka") version "1.4.0-rc"
 }
+
+//subprojects {
+//    apply(plugin = "org.jetbrains.dokka")
+//
+//    repositories {
+//        jcenter()
+//    }
+//}
 
 group = "me.schlaubi"
 version = "1.2"
@@ -16,14 +23,14 @@ repositories {
     jcenter()
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
-    implementation("org.jetbrains", "annotations", "19.0.0")
-    compileOnly("org.spigotmc", "spigot-api", "1.15.2-R0.1-SNAPSHOT")
+    api("org.jetbrains", "annotations", "19.0.0")
 
     compileOnly(kotlin("stdlib-jdk8"))
+    // Spigot and bungee already shade guava so no need to "api()" it
+    compileOnly("com.google.guava", "guava", "28.0-jre")
 
     // Tests
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.6.0")
@@ -46,13 +53,19 @@ tasks {
         from(sourceSets["main"].allSource)
     }
 
-
     val javadocJar = task<Jar>("javadocJar") {
         dependsOn(dokkaHtml)
         group = JavaBasePlugin.DOCUMENTATION_GROUP
         archiveClassifier.set("javadoc")
         from(dokkaHtml)
     }
+
+//    val javadocJar = task<Jar>("javadocJar") {
+//        dependsOn(javadoc)
+//        group = JavaBasePlugin.DOCUMENTATION_GROUP
+//        archiveClassifier.set("javadoc")
+//        from(javadoc)
+//    }
 
     publishing {
         publications {
@@ -85,6 +98,11 @@ tasks {
                 }
 
                 jdkVersion = 8
+
+                perPackageOption {
+                    prefix = "me.schlaubi.kaesk.internal"
+                    includeNonPublic = false
+                }
 
                 // seems to bee bugged in this version
 //                externalDocumentationLink {

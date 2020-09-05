@@ -1,14 +1,14 @@
 package me.schlaubi.kaesk.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import me.schlaubi.kaesk.api.ArgumentDeserializer;
+import me.schlaubi.kaesk.api.CommandSender;
 import me.schlaubi.kaesk.internal.CommandUtils.CommandContainer;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 
 public class TabCompleter {
 
@@ -19,10 +19,8 @@ public class TabCompleter {
     this.deserializers = deserializers;
   }
 
-  @SuppressWarnings("unused")
     /* package-private */ List<String> onTabComplete(final CompiledCommandClass compiledCommand,
-      final CommandSender sender,
-      final Command command, final String alias, final String[] args) {
+      final CommandSender<?> sender, final String alias, final String[] args) {
     final List<String> possibleArgs = findArgs(compiledCommand, args, sender);
     return possibleArgs.stream()
         .filter(it -> it.toUpperCase().startsWith(args[args.length - 1].toUpperCase()))
@@ -30,17 +28,20 @@ public class TabCompleter {
   }
 
   private List<String> findArgs(CompiledCommandClass compiledCommand,
-      String[] args, CommandSender sender) {
+      String[] args, CommandSender<?> sender) {
     final CommandContainer commandContainer = CommandUtils
         .findCommandInvokable(compiledCommand, args);
     final CommandInvokable invoke = commandContainer.getInvoke();
     if (!sender.hasPermission(invoke.getPermission())) {
       return Collections.emptyList();
     }
-    CommandParameter currentParameter = findCurrentParameter(invoke, args.length);
+
+    String[] cleanArgs = commandContainer.getParsedArgs();
+
+    CommandParameter currentParameter = findCurrentParameter(invoke, cleanArgs.length);
 
     if (currentParameter == null) {
-      final CommandParameter secondTry = findCurrentParameter(invoke, args.length + 1);
+      final CommandParameter secondTry = findCurrentParameter(invoke, cleanArgs.length + 1);
       if (secondTry == null) {
         return Collections.emptyList();
       }

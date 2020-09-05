@@ -2,7 +2,7 @@ package me.schlaubi.kaesk.internal;
 
 import org.jetbrains.annotations.NotNull;
 
-class CompiledCommandClass {
+public class CompiledCommandClass {
   @NotNull
   final CommandTreeElement commandTree;
   @NotNull
