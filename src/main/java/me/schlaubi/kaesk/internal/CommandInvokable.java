@@ -30,8 +30,8 @@ class CommandInvokable {
     this.consoleAllowed = consoleAllowed;
   }
 
-  public void invoke(@NotNull final Object... args) throws InvocationTargetException, IllegalAccessException {
-    invokable.invoke(executor, args);
+  public Object invoke(@NotNull final Object... args) throws InvocationTargetException, IllegalAccessException {
+    return invokable.invoke(executor, args);
   }
 
   public @NotNull Object getExecutor() {

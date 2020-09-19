@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation("me.schlaubi", "kaesk-bungee", "2.0")
+    implementation("me.schlaubi", "kaesk-bungee", "2.1")
 }
 ```
 
@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'me.schlaubi:kaesk-bungee:2.0"'
+    implementation 'me.schlaubi:kaesk-bungee:2.1"'
 }
 ```
 
@@ -34,7 +34,7 @@ dependencies {
   <dependency>
     <groupId>me.schlaubi</groupId>
     <artifactId>kaesk-bukkit</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
   </dependency>
 </dependencies>
 ```
@@ -70,3 +70,5 @@ commandClient = commandClient {
 
 There are some more kotlin extensions you can find in the Documentation
 If you use the Plugin.commandClient() extension you do not have to specify a plugin instance
+
+Docs: https://p.mik.wtf/kaesk-bungee

@@ -1,0 +1,6 @@
+$dokka.format:html
+$dokka.linkExtension:html
+
+me.schlaubi.kaesk.api.bungee
+me.schlaubi.kaesk.internal
+

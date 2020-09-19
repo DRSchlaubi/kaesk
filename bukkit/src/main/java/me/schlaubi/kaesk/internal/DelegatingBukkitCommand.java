@@ -1,6 +1,8 @@
 package me.schlaubi.kaesk.internal;
 
+import java.util.Collections;
 import java.util.List;
+import me.schlaubi.kaesk.api.NoArgumentsException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,14 +25,22 @@ class DelegatingBukkitCommand implements CommandExecutor, TabExecutor {
   @Override
   public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command,
       @NotNull final String label, @NotNull final String[] args) {
-    return commandClient.onCommand(compiledCommand, new BukkitCommandSender(sender), label, args);
+    try {
+      return commandClient.onCommand(compiledCommand, new BukkitCommandSender(sender), label, args);
+    } catch (NoArgumentsException e) {
+      return false;
+    }
   }
 
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull final CommandSender sender,
       @NotNull final Command command, @NotNull final String alias, @NotNull final String[] args) {
-    return commandClient.onTabComplete(compiledCommand, new BukkitCommandSender(sender), alias, args);
+    try {
+      return commandClient.onTabComplete(compiledCommand, new BukkitCommandSender(sender), alias, args);
+    } catch (NoArgumentsException e) {
+      return Collections.emptyList();
+    }
   }
 
   private static class BukkitCommandSender implements me.schlaubi.kaesk.api.CommandSender<CommandSender> {

@@ -4,20 +4,53 @@ plugins {
     java
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.4.10"
     id("org.jetbrains.dokka") version "1.4.0-rc"
 }
 
-//subprojects {
-//    apply(plugin = "org.jetbrains.dokka")
-//
-//    repositories {
-//        jcenter()
-//    }
-//}
+allprojects {
+    apply(plugin = "org.jetbrains.dokka")
+
+    repositories {
+        jcenter()
+    }
+
+    tasks {
+        dokkaHtml {
+            outputDirectory = rootProject.file("docs/").absolutePath.toString()
+
+            dokkaSourceSets {
+                configureEach {
+                    includeNonPublic = false
+
+                    sourceLink {
+                        path = "src"
+
+                        url = "https://github.com/DRSchlaubi/kaesk/tree/master/src"
+
+                        lineSuffix = "#L"
+                    }
+
+                    jdkVersion = 8
+
+                    perPackageOption {
+                        prefix = "me.schlaubi.kaesk.internal"
+                        includeNonPublic = false
+                    }
+
+                    // seems to bee bugged in this version
+//                externalDocumentationLink {
+//                    url = URL("https://hub.spigotmc.org/javadocs/spigot/")
+//                }
+                }
+            }
+        }
+
+    }
+}
 
 group = "me.schlaubi"
-version = "1.2"
+version = "2.1"
 
 repositories {
     jcenter()
@@ -46,7 +79,6 @@ tasks {
         useJUnitPlatform()
     }
 
-
     val sourcesJar = task<Jar>("sourcesJar") {
         dependsOn(classes)
         archiveClassifier.set("sources")
@@ -59,13 +91,6 @@ tasks {
         archiveClassifier.set("javadoc")
         from(dokkaHtml)
     }
-
-//    val javadocJar = task<Jar>("javadocJar") {
-//        dependsOn(javadoc)
-//        group = JavaBasePlugin.DOCUMENTATION_GROUP
-//        archiveClassifier.set("javadoc")
-//        from(javadoc)
-//    }
 
     publishing {
         publications {
@@ -80,36 +105,6 @@ tasks {
     compileTestJava {
         targetCompatibility = "11"
         sourceCompatibility = "11"
-    }
-
-    dokkaHtml {
-        outputDirectory = "docs/"
-
-        dokkaSourceSets {
-            configureEach {
-                includeNonPublic = false
-
-                sourceLink {
-                    path = "src"
-
-                    url = "https://github.com/DRSchlaubi/kaesk/tree/master/src"
-
-                    lineSuffix = "#L"
-                }
-
-                jdkVersion = 8
-
-                perPackageOption {
-                    prefix = "me.schlaubi.kaesk.internal"
-                    includeNonPublic = false
-                }
-
-                // seems to bee bugged in this version
-//                externalDocumentationLink {
-//                    url = URL("https://hub.spigotmc.org/javadocs/spigot/")
-//                }
-            }
-        }
     }
 }
 

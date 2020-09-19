@@ -8,11 +8,11 @@ import org.bukkit.entity.Player;
 
 @CommandClass(name = "gamemode", permission = "plugin.gamemode")
 public class GameModeCommand {
-
-  @Command(root = true, consoleAllowed = true)
-  public void rootCommand(CommandSender sender) {
-    sender.sendMessage("Usage: /gamemode <mode> <player>");
-  }
+//
+//  @Command(root = true, consoleAllowed = true)
+//  public void rootCommand(CommandSender sender) {
+//    sender.sendMessage("Usage: /gamemode <mode> <player>");
+//  }
 
   @Command(root = true)
   public void rootCommand(Player player, GameMode gameMode) {

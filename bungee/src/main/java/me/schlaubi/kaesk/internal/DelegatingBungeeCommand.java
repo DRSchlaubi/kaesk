@@ -27,11 +27,12 @@ public class DelegatingBungeeCommand extends Command implements TabExecutor {
 
   @Override
   public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-    return commandClient.onTabComplete(compiledCommandClass, new BungeeCommandSender(sender), getName(), args);
+    return commandClient
+        .onTabComplete(compiledCommandClass, new BungeeCommandSender(sender), getName(), args);
   }
 
-
-  private static class BungeeCommandSender implements me.schlaubi.kaesk.api.CommandSender<CommandSender> {
+  private static class BungeeCommandSender implements
+      me.schlaubi.kaesk.api.CommandSender<CommandSender> {
 
     private final CommandSender bungeeSender;
 

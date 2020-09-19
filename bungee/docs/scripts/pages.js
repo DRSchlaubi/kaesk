@@ -1,0 +1,2 @@
+var pages = [{'name': 'open class BungeeConverters', 'index': '0', 'description':'me.schlaubi.kaesk.api.bungee.BungeeConverters', 'location':'kaesk-bungee/me.schlaubi.kaesk.api.bungee/-bungee-converters/index.html', 'searchKey':'BungeeConverters'},
+{'name': 'interface BungeeCommandClient : CommandClient', 'index': '1', 'description':'me.schlaubi.kaesk.api.bungee.BungeeCommandClient', 'location':'kaesk-bungee/me.schlaubi.kaesk.api.bungee/-bungee-command-client/index.html', 'searchKey':'BungeeCommandClient'}]

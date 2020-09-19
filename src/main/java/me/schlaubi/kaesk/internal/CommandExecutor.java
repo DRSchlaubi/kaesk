@@ -1,6 +1,5 @@
 package me.schlaubi.kaesk.internal;
 
-import com.google.common.base.Preconditions;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +11,7 @@ import me.schlaubi.kaesk.api.ArgumentDeserializer;
 import me.schlaubi.kaesk.api.ArgumentException;
 import me.schlaubi.kaesk.api.CommandSender;
 import me.schlaubi.kaesk.api.InvalidArgumentHandler;
+import me.schlaubi.kaesk.api.NoArgumentsException;
 import me.schlaubi.kaesk.api.NoPermissionHandler;
 import me.schlaubi.kaesk.internal.CommandUtils.CommandContainer;
 import org.jetbrains.annotations.NotNull;
@@ -37,9 +37,9 @@ class CommandExecutor<PLAYER> {
     this.logger = logger;
   }
 
-  @SuppressWarnings("unused")
-    /* package-private */ boolean onCommand(@NotNull final CompiledCommandClass compiledCommand,
-      @NotNull final CommandSender<?> sender, @NotNull final String label, @NotNull final String[] args) {
+  /* package-private */ boolean onCommand(@NotNull final CompiledCommandClass compiledCommand,
+      @NotNull final CommandSender<?> sender, @NotNull final String label,
+      @NotNull final String[] args) {
     final CommandContainer commandContainer = CommandUtils
         .findCommandInvokable(compiledCommand, args);
     final CommandInvokable invoke = commandContainer.getInvoke();
@@ -69,8 +69,12 @@ class CommandExecutor<PLAYER> {
       convertedArgs.add(0, player);
     }
     try {
-      invoke.invoke(convertedArgs.toArray());
-      return true;
+      Object result = invoke.invoke(convertedArgs.toArray());
+      try {
+        return (boolean) result;
+      } catch (ClassCastException e) {
+        return true;
+      }
     } catch (InvocationTargetException | IllegalAccessException e) {
       logger.log(Level.SEVERE, "Error while invoking method", e);
       return false;
@@ -84,13 +88,17 @@ class CommandExecutor<PLAYER> {
     if (parameterSize == 0) {
       _args = new String[0];
     }
-    if (_args.length > parameterSize && !invokable.getParameters().get(parameterSize - 1).isVarArg()) {
+    if (_args.length > parameterSize && !invokable.getParameters().get(parameterSize - 1)
+        .isVarArg()) {
       _args = Arrays.copyOfRange(_args, 0, parameterSize);
     }
     final String[] args = _args;
+    if (args.length <= 0) {
+      throw new NoArgumentsException();
+    }
     return invokable.getParameters().stream().map(parameter -> {
-      Preconditions.checkArgument(args.length > 0, "If you wish to have a default command without any parameters please add one to your command class");
-      final ArgumentDeserializer<?> converter = CommandUtils.findDeserializer(deserializers, parameter);
+      final ArgumentDeserializer<?> converter = CommandUtils
+          .findDeserializer(deserializers, parameter);
       if (parameter.isVarArg()) {
         final String[] input = Arrays
             .copyOfRange(args, invokable.getParameters().indexOf(parameter), args.length);

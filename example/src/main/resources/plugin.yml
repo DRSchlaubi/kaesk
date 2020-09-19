@@ -5,6 +5,7 @@ author: mik
 api-version: '1.13'
 commands:
   gamemode:
+    usage: "Usage: /gamemode <mode> <player>"
   say:
   sum:
   test:
