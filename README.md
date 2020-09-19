@@ -3,7 +3,7 @@
 ![Demo video](https://rice.by.devs-from.asia/OrNX5gv9jh.gif)
 
 This is a very simple Spigot command parser
-**Info** This library only works when using java 14+ and at list this PaperMC build ([#229](https://papermc.io/api/v1/paper/1.15.2/229/download)) because of some wierd bugs in spigot code
+~~**Info** This library only works when using java 14+ and at least this PaperMC build ([#229](https://papermc.io/api/v1/paper/1.15.2/229/download)) because of some wierd bugs in spigot code~~ Only for 1.1 and prior
 
 ## Usage
 Make a command.
