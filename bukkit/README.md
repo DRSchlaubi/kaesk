@@ -71,4 +71,7 @@ commandClient = commandClient {
 There are some more kotlin extensions you can find in the Documentation
 If you use the JavaPlugin.commandClient() extension you do not have to specify a plugin instance
 
+Since kaesk 2.1 you can also return a boolean value which will then be returned at CommandExecutor level to print bukkits built-in usage message
+This implementation also catches the NoArgumentsException and returns false to print the usage message
+
 Docs: https://p.mik.wtf/kaesk-bukkit
